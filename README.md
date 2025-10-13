@@ -27,6 +27,7 @@ Set the following environment variables:
 ```bash
 $ export SAKURACLOUD_ACCESS_TOKEN="your-access-token"
 $ export SAKURACLOUD_ACCESS_TOKEN_SECRET="your-access-token-secret"
+$ export SAKURACLOUD_SECRETS_ID="your-vault-resource-id"
 ```
 
 ## Usage
@@ -34,7 +35,7 @@ $ export SAKURACLOUD_ACCESS_TOKEN_SECRET="your-access-token-secret"
 ### Basic Usage
 
 ```bash
-$ echo "$value" | sakura-secret-diff -resource-id <vault-resource-id> -name <secret-name>
+$ echo "$value" | sakura-secrets-diff -name <secret-name>
 ```
 
 ### With sops and yq
@@ -44,13 +45,12 @@ Use case for integrating [sops](https://github.com/getsops/sops) and [yq](https:
 ```bash
 $ sops -d secrets.yaml | yq -r 'to_entries[] | "\(.key)\t\(.value)"' | \
 while IFS=$'\t' read -r key value; do
-  echo "$value" | sakura-secrets-diff -resource-id <vault-resource-id> -name "$key"
+  echo "$value" | sakura-secrets-diff -name "$key"
 done
 ```
 
 ### Options
 
-- `-resource-id` (required): Vault resource ID
 - `-name` (required): Secret name
 - `-zone` (optional, default: `is1a`): Zone name
 - `-version` (optional, default: `0`): Secret version (0 = latest)
@@ -82,7 +82,7 @@ The actual secret values are never displayed.
 ### Check if a secret matches
 
 ```bash
-$ echo "my-secret-value" | sakura-secrets-diff -resource-id vault123 -name my-secret
+$ echo "my-secret-value" | sakura-secrets-diff -name my-secret
 # Output: my-secret : No Differences
 # Exit code: 0
 ```
@@ -90,7 +90,7 @@ $ echo "my-secret-value" | sakura-secrets-diff -resource-id vault123 -name my-se
 ### Suppress output (use exit code only)
 
 ```bash
-$ echo "$value" | sakura-secrets-diff -resource-id vault123 -name my-secret >/dev/null
+$ echo "$value" | sakura-secrets-diff -name my-secret >/dev/null
 $ echo $?  # 0, 1, or 2
 ```
 

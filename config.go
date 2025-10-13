@@ -6,21 +6,30 @@ import (
 )
 
 // LoadConfig loads configuration from environment variables
-func LoadConfig(zone, resourceID string) (*Config, error) {
+func LoadConfig(zone string) (*Config, error) {
 	accessToken := os.Getenv("SAKURACLOUD_ACCESS_TOKEN")
 	accessTokenSecret := os.Getenv("SAKURACLOUD_ACCESS_TOKEN_SECRET")
+	secretsID := os.Getenv("SAKURACLOUD_SECRETS_ID")
 
+	var missing []string
 	if accessToken == "" {
-		return nil, fmt.Errorf("SAKURACLOUD_ACCESS_TOKEN environment variable is required")
+		missing = append(missing, "SAKURACLOUD_ACCESS_TOKEN")
 	}
 	if accessTokenSecret == "" {
-		return nil, fmt.Errorf("SAKURACLOUD_ACCESS_TOKEN_SECRET environment variable is required")
+		missing = append(missing, "SAKURACLOUD_ACCESS_TOKEN_SECRET")
+	}
+	if secretsID == "" {
+		missing = append(missing, "SAKURACLOUD_SECRETS_ID")
+	}
+
+	if len(missing) > 0 {
+		return nil, fmt.Errorf("required environment variables not set: %v", missing)
 	}
 
 	return &Config{
 		AccessToken:       accessToken,
 		AccessTokenSecret: accessTokenSecret,
 		Zone:              zone,
-		ResourceID:        resourceID,
+		ResourceID:        secretsID,
 	}, nil
 }

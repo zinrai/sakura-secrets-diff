@@ -9,29 +9,24 @@ import (
 
 func main() {
 	var (
-		resourceID string
-		name       string
-		zone       string
-		version    int
+		name    string
+		zone    string
+		version int
 	)
 
-	flag.StringVar(&resourceID, "resource-id", "", "Vault resource ID (required)")
 	flag.StringVar(&name, "name", "", "Secret name (required)")
 	flag.StringVar(&zone, "zone", "is1a", "Zone name (default: is1a)")
 	flag.IntVar(&version, "version", 0, "Secret version (default: 0 = latest)")
 	flag.Parse()
 
-	if err := run(resourceID, name, zone, version); err != nil {
+	if err := run(name, zone, version); err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		os.Exit(2)
 	}
 }
 
-func run(resourceID, name, zone string, version int) error {
+func run(name, zone string, version int) error {
 	// Validate required parameters
-	if resourceID == "" {
-		return fmt.Errorf("-resource-id is required")
-	}
 	if name == "" {
 		return fmt.Errorf("-name is required")
 	}
@@ -47,7 +42,7 @@ func run(resourceID, name, zone string, version int) error {
 	}
 
 	// Load configuration from environment variables
-	config, err := LoadConfig(zone, resourceID)
+	config, err := LoadConfig(zone)
 	if err != nil {
 		return err
 	}
