@@ -14,12 +14,6 @@ A command-line tool to compare a secret value from stdin with a secret stored in
 - Sakura Cloud account with Secret Manager access
 - Valid API credentials (Access Token and Access Token Secret)
 
-## Installation
-
-```bash
-$ go install github.com/zinrai/sakura-secrets-diff@latest
-```
-
 ## Configuration
 
 Set the following environment variables:
