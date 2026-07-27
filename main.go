@@ -9,28 +9,36 @@ import (
 
 func main() {
 	var (
-		name    string
-		zone    string
-		version int
+		name          string
+		zone          string
+		secretVersion int
 	)
 
 	flag.StringVar(&name, "name", "", "Secret name (required)")
 	flag.StringVar(&zone, "zone", "is1a", "Zone name (default: is1a)")
-	flag.IntVar(&version, "version", 0, "Secret version (default: 0 = latest)")
+	flag.IntVar(&secretVersion, "version", 0, "Secret version (default: 0 = latest)")
+	flag.Usage = usage
 	flag.Parse()
 
-	if err := run(name, zone, version); err != nil {
+	if name == "" {
+		usage()
+		os.Exit(2)
+	}
+
+	if err := run(name, zone, secretVersion); err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		os.Exit(2)
 	}
 }
 
-func run(name, zone string, version int) error {
-	// Validate required parameters
-	if name == "" {
-		return fmt.Errorf("-name is required")
-	}
+func usage() {
+	fmt.Fprintf(os.Stderr, "sakura-secrets-diff %s (commit %s, built %s)\n\n", version, commit, date)
+	fmt.Fprintf(os.Stderr, "Usage: sakura-secrets-diff -name <secret-name> [options]\n\n")
+	fmt.Fprintf(os.Stderr, "Compares a secret value from stdin with the value in Secret Manager.\n\nOptions:\n")
+	flag.PrintDefaults()
+}
 
+func run(name, zone string, secretVersion int) error {
 	// Read local value from stdin
 	localValue, err := io.ReadAll(os.Stdin)
 	if err != nil {
@@ -41,17 +49,20 @@ func run(name, zone string, version int) error {
 		return fmt.Errorf("no input provided via stdin")
 	}
 
-	// Load configuration from environment variables
-	config, err := LoadConfig(zone)
+	// Resolve the Vault resource ID from environment variables
+	vaultID, err := LoadVaultID()
 	if err != nil {
 		return err
 	}
 
 	// Create API client
-	client := NewClient(config)
+	op, err := NewSecretOp(zone, vaultID)
+	if err != nil {
+		return err
+	}
 
 	// Get remote value from Secret Manager
-	remoteValue, err := client.GetSecret(name, version)
+	remoteValue, err := GetSecret(op, name, secretVersion)
 	if err != nil {
 		return fmt.Errorf("failed to get secret from API: %w", err)
 	}

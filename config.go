@@ -5,31 +5,10 @@ import (
 	"os"
 )
 
-// LoadConfig loads configuration from environment variables
-func LoadConfig(zone string) (*Config, error) {
-	accessToken := os.Getenv("SAKURACLOUD_ACCESS_TOKEN")
-	accessTokenSecret := os.Getenv("SAKURACLOUD_ACCESS_TOKEN_SECRET")
-	secretsID := os.Getenv("SAKURACLOUD_SECRETS_ID")
-
-	var missing []string
-	if accessToken == "" {
-		missing = append(missing, "SAKURACLOUD_ACCESS_TOKEN")
+// LoadVaultID resolves the Vault resource ID from the environment.
+func LoadVaultID() (string, error) {
+	if v := os.Getenv("SAKURA_SECRETS_ID"); v != "" {
+		return v, nil
 	}
-	if accessTokenSecret == "" {
-		missing = append(missing, "SAKURACLOUD_ACCESS_TOKEN_SECRET")
-	}
-	if secretsID == "" {
-		missing = append(missing, "SAKURACLOUD_SECRETS_ID")
-	}
-
-	if len(missing) > 0 {
-		return nil, fmt.Errorf("required environment variables not set: %v", missing)
-	}
-
-	return &Config{
-		AccessToken:       accessToken,
-		AccessTokenSecret: accessTokenSecret,
-		Zone:              zone,
-		ResourceID:        secretsID,
-	}, nil
+	return "", fmt.Errorf("required environment variable not set: SAKURA_SECRETS_ID")
 }

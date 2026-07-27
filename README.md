@@ -12,16 +12,29 @@ A command-line tool to compare a secret value from stdin with a secret stored in
 ## Requirements
 
 - Sakura Cloud account with Secret Manager access
-- Valid API credentials (Access Token and Access Token Secret)
+- Valid API credentials (static API keys or a service principal)
 
 ## Configuration
 
-Set the following environment variables:
+Set the Vault resource ID:
 
 ```bash
-$ export SAKURACLOUD_ACCESS_TOKEN="your-access-token"
-$ export SAKURACLOUD_ACCESS_TOKEN_SECRET="your-access-token-secret"
-$ export SAKURACLOUD_SECRETS_ID="your-vault-resource-id"
+$ export SAKURA_SECRETS_ID="your-vault-resource-id"
+```
+
+API credentials are resolved by [saclient-go](https://github.com/sacloud/saclient-go). Set either static API keys:
+
+```bash
+$ export SAKURA_ACCESS_TOKEN="your-access-token"
+$ export SAKURA_ACCESS_TOKEN_SECRET="your-access-token-secret"
+```
+
+or service principal credentials:
+
+```bash
+$ export SAKURA_SERVICE_PRINCIPAL_ID="your-service-principal-id"
+$ export SAKURA_SERVICE_PRINCIPAL_KEY_ID="your-key-id"
+$ export SAKURA_PRIVATE_KEY_PATH="/path/to/private-key.pem"
 ```
 
 ## Usage
