@@ -39,7 +39,6 @@ func usage() {
 }
 
 func run(name, zone string, secretVersion int) error {
-	// Read local value from stdin
 	localValue, err := io.ReadAll(os.Stdin)
 	if err != nil {
 		return fmt.Errorf("failed to read stdin: %w", err)
@@ -49,31 +48,25 @@ func run(name, zone string, secretVersion int) error {
 		return fmt.Errorf("no input provided via stdin")
 	}
 
-	// Resolve the Vault resource ID from environment variables
 	vaultID, err := LoadVaultID()
 	if err != nil {
 		return err
 	}
 
-	// Create API client
 	op, err := NewSecretOp(zone, vaultID)
 	if err != nil {
 		return err
 	}
 
-	// Get remote value from Secret Manager
 	remoteValue, err := GetSecret(op, name, secretVersion)
 	if err != nil {
 		return fmt.Errorf("failed to get secret from API: %w", err)
 	}
 
-	// Compare secrets
 	result := CompareSecrets(localValue, remoteValue, name)
 
-	// Output result
 	fmt.Println(result.String())
 
-	// Set exit code based on comparison result
 	if !result.IsEqual {
 		os.Exit(1)
 	}
