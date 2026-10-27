@@ -63,13 +63,12 @@ func run(name, zone string, secretVersion int) error {
 		return fmt.Errorf("failed to get secret from API: %w", err)
 	}
 
-	result := CompareSecrets(localValue, remoteValue, name)
-
-	fmt.Println(result.String())
-
-	if !result.IsEqual {
+	if !CompareSecrets(localValue, remoteValue) {
+		fmt.Printf("%s : With Differences\n", name)
 		os.Exit(1)
 	}
+
+	fmt.Printf("%s : No Differences\n", name)
 
 	return nil
 }
