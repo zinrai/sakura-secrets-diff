@@ -25,10 +25,18 @@ func main() {
 		os.Exit(2)
 	}
 
-	if err := run(name, zone, secretVersion); err != nil {
+	equal, err := run(name, zone, secretVersion)
+	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		os.Exit(2)
 	}
+
+	if !equal {
+		fmt.Printf("%s : With Differences\n", name)
+		os.Exit(1)
+	}
+
+	fmt.Printf("%s : No Differences\n", name)
 }
 
 func usage() {
@@ -38,37 +46,30 @@ func usage() {
 	flag.PrintDefaults()
 }
 
-func run(name, zone string, secretVersion int) error {
+func run(name, zone string, secretVersion int) (bool, error) {
 	localValue, err := io.ReadAll(os.Stdin)
 	if err != nil {
-		return fmt.Errorf("failed to read stdin: %w", err)
+		return false, fmt.Errorf("failed to read stdin: %w", err)
 	}
 
 	if len(localValue) == 0 {
-		return fmt.Errorf("no input provided via stdin")
+		return false, fmt.Errorf("no input provided via stdin")
 	}
 
 	vaultID, err := LoadVaultID()
 	if err != nil {
-		return err
+		return false, err
 	}
 
 	op, err := NewSecretOp(zone, vaultID)
 	if err != nil {
-		return err
+		return false, err
 	}
 
 	remoteValue, err := GetSecret(op, name, secretVersion)
 	if err != nil {
-		return fmt.Errorf("failed to get secret from API: %w", err)
+		return false, fmt.Errorf("failed to get secret from API: %w", err)
 	}
 
-	if !CompareSecrets(localValue, remoteValue) {
-		fmt.Printf("%s : With Differences\n", name)
-		os.Exit(1)
-	}
-
-	fmt.Printf("%s : No Differences\n", name)
-
-	return nil
+	return CompareSecrets(localValue, remoteValue), nil
 }
