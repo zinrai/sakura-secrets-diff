@@ -60,7 +60,7 @@ done
 
 - `-name` (required): Secret name
 - `-zone` (optional, default: `is1a`): Zone name
-- `-version` (optional, default: `0`): Secret version (0 = latest)
+- `-secret-version` (optional, default: `0`): Secret version (0 = latest)
 
 ### Exit Codes
 
