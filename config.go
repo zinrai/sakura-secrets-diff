@@ -5,7 +5,6 @@ import (
 	"os"
 )
 
-// LoadVaultID resolves the Vault resource ID from the environment.
 func LoadVaultID() (string, error) {
 	if v := os.Getenv("SAKURA_SECRETS_ID"); v != "" {
 		return v, nil
