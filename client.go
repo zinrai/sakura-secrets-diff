@@ -6,7 +6,6 @@ import (
 	"os"
 
 	secretmanager "github.com/sacloud/sacloud-sdk-go/api/secretmanager"
-	v1 "github.com/sacloud/sacloud-sdk-go/api/secretmanager/apis/v1"
 	"github.com/sacloud/sacloud-sdk-go/common/saclient"
 )
 
@@ -35,11 +34,11 @@ func NewSecretOp(zone, vaultID string) (secretmanager.SecretAPI, error) {
 // GetSecret retrieves a secret value from the Vault using the unveil API.
 // version 0 means the latest version.
 func GetSecret(op secretmanager.SecretAPI, secretName string, version int) (string, error) {
-	req := v1.Unveil{
+	req := secretmanager.UnveilParams{
 		Name: secretName,
 	}
 	if version != 0 {
-		req.Version = v1.NewOptNilInt(version)
+		req.Version = &version
 	}
 
 	res, err := op.Unveil(context.Background(), req)
