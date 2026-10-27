@@ -15,8 +15,8 @@ func main() {
 	)
 
 	flag.StringVar(&name, "name", "", "Secret name (required)")
-	flag.StringVar(&zone, "zone", "is1a", "Zone name (default: is1a)")
-	flag.IntVar(&secretVersion, "version", 0, "Secret version (default: 0 = latest)")
+	flag.StringVar(&zone, "zone", "is1a", "Zone name")
+	flag.IntVar(&secretVersion, "version", 0, "Secret version, 0 for the latest")
 	flag.Usage = usage
 	flag.Parse()
 
